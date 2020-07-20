@@ -1,10 +1,14 @@
-package com.piorun.app.reminder;
+package com.piorun.app.controller;
 
 import com.piorun.app.mail.EmailService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.sql.Time;
+import java.util.TimeZone;
 
 @RestController
 public class ReminderController {
@@ -15,25 +19,17 @@ public class ReminderController {
         this.service = service;
     }
 
-//    @Scheduled(cron = "0 15 10 ? * MON,FRI")
+    @Scheduled(cron = "0 0 7 * * *", zone = "CET")
     public void remind() {
         service.remindAll();
     }
 
-//    @Scheduled(cron = "0 15 9 ? * FRI")
-    public void startWeekend() {
-        service.startWeekend();
-    }
-
-//    @Scheduled(cron = "0 15 9 ? * MON")
-    public void endWeekend() {
-        service.endWeekend();
-    }
 
     @GetMapping("/logs")
-    public List<String> getLogs() {
-        return service.getLogs();
+    public ResponseEntity<String> getLogs() {
+        return new ResponseEntity<>(service.getLogs().toString(), HttpStatus.OK);
     }
+
 
     @GetMapping("/")
     public String hello() {

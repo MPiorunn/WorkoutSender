@@ -1,17 +1,18 @@
 package com.piorun.app.mail;
 
-import com.piorun.app.reminder.house.Flatmate;
-import com.piorun.app.reminder.house.Room;
-import com.piorun.app.reminder.logger.MailLogger;
+import com.piorun.app.logger.AbstractLogger;
+import com.piorun.app.workout.Person;
+import com.piorun.app.workout.Workout;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import static com.piorun.app.reminder.messages.MailTextCreator.*;
+import java.util.Map;
 
 
 @Component
@@ -19,63 +20,56 @@ public class EmailService {
 
     private final JavaMailSender emailSender;
 
-    private final MailLogger logger;
+    private final AbstractLogger logger;
 
-    private List<Flatmate> flatmates = Arrays.asList(Flatmate.values());
+    private final List<Person> people = new ArrayList<>();
 
-    public EmailService(JavaMailSender emailSender, MailLogger logger) {
+    public EmailService(JavaMailSender emailSender, AbstractLogger logger) {
         this.emailSender = emailSender;
         this.logger = logger;
+
+        Map<DayOfWeek, Workout> workoutMap = new HashMap<>();
+        Workout workout = new Workout();
+        workout.add("joga : https://www.youtube.com/watch?v=ABBuecfNqXc&list=PLRz2ixZUdsyRkGl1OVdZf3pz1FylysvCT");
+        workout.add("bieganko : setki");
+        workoutMap.put(DayOfWeek.MONDAY, workout);
+        workoutMap.put(DayOfWeek.TUESDAY, workout);
+        workoutMap.put(DayOfWeek.WEDNESDAY, workout);
+        workoutMap.put(DayOfWeek.THURSDAY, workout);
+        workoutMap.put(DayOfWeek.FRIDAY, workout);
+        workoutMap.put(DayOfWeek.SATURDAY, workout);
+        people.add(new Person("maciej.piorun@op.pl", "Maciej", workoutMap));
     }
 
     public void remindAll() {
-
-        logger.debug("Starting sending reminders");
-
-        for (int i = 0; i < Room.values().length; i++) {
-            logger.debug("Creating reminder for " + flatmates.get(i));
-            logger.debug("Today you have to clean " + Room.values()[i]);
-            sendReminder(flatmates.get(i), Room.values()[i]);
+        for (Person person : people) {
+            sendReminder(person);
         }
     }
 
-    private void sendReminder(Flatmate mate, Room room) {
-
-        String address = mate.getAddress();
-        String subject = createSubject();
-        String text = createGreeting(mate.getName()) + createCleaning(room.getName());
+    private void sendReminder(Person person) {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
+        logger.debug("Sending mail to " + person.getEmail());
+//        logger.debug("Mail content " + workout.toString());
 
-        mailMessage.setTo(address);
-        mailMessage.setSubject(subject);
-        mailMessage.setText(text);
-
+        mailMessage.setTo(person.getEmail());
+        mailMessage.setSubject("Twoj trening na dzis");
+        mailMessage.setText(prepareText(person));
         emailSender.send(mailMessage);
-        logger.debug("Message sent to " + mate.getAddress());
-        System.out.println();
-
     }
 
-    public void startWeekend() {
-        logger.clean();
-        logger.debug("Weekend started");
-    }
 
-    public void endWeekend() {
-        logger.debug("Weekend ended");
-        shift();
-    }
+    private String prepareText(Person person) {
+        DayOfWeek today = LocalDate.now().getDayOfWeek();
+        Workout workout = person.getWeekDays().get(today);
 
-    public void shift() {
-        Collections.rotate(flatmates, 1);
+        String greetings = "Hej " + person.getName() + "\n\n";
+        String intro = "Na dzisiejszy dzień twój trening to:\n\n";
+        return greetings + intro + workout.toString();
     }
 
     public List<String> getLogs() {
         return logger.getLogs();
-    }
-
-    public List<Flatmate> getFlatmates() {
-        return flatmates;
     }
 }

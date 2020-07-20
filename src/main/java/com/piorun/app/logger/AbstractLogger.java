@@ -1,6 +1,5 @@
-package com.piorun.app.mail;
+package com.piorun.app.logger;
 
-import com.piorun.app.reminder.logger.MailLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
