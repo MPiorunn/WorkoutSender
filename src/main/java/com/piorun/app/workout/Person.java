@@ -2,8 +2,12 @@ package com.piorun.app.workout;
 
 import java.time.DayOfWeek;
 import java.util.Map;
+import org.springframework.data.annotation.Id;
 
 public class Person {
+
+    @Id
+    private String id;
     private String email;
     private String name;
     private Map<DayOfWeek, Workout> weekDays;
@@ -36,5 +40,13 @@ public class Person {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

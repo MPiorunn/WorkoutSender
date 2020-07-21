@@ -28,17 +28,6 @@ public class EmailService {
         this.emailSender = emailSender;
         this.logger = logger;
 
-        Map<DayOfWeek, Workout> workoutMap = new HashMap<>();
-        Workout workout = new Workout();
-        workout.add("joga : https://www.youtube.com/watch?v=ABBuecfNqXc&list=PLRz2ixZUdsyRkGl1OVdZf3pz1FylysvCT");
-        workout.add("bieganko : setki");
-        workoutMap.put(DayOfWeek.MONDAY, workout);
-        workoutMap.put(DayOfWeek.TUESDAY, workout);
-        workoutMap.put(DayOfWeek.WEDNESDAY, workout);
-        workoutMap.put(DayOfWeek.THURSDAY, workout);
-        workoutMap.put(DayOfWeek.FRIDAY, workout);
-        workoutMap.put(DayOfWeek.SATURDAY, workout);
-        people.add(new Person("maciej.piorun@op.pl", "Maciej", workoutMap));
     }
 
     public void remindAll() {
