@@ -1,18 +1,17 @@
 package com.piorun.app.mail;
 
-import com.piorun.app.logger.AbstractLogger;
+import com.piorun.app.repository.PersonRepository;
 import com.piorun.app.workout.Person;
 import com.piorun.app.workout.Workout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Component
@@ -20,14 +19,14 @@ public class EmailService {
 
     private final JavaMailSender emailSender;
 
-    private final AbstractLogger logger;
+    private final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    private final List<Person> people = new ArrayList<>();
+    private final List<Person> people;
 
-    public EmailService(JavaMailSender emailSender, AbstractLogger logger) {
+    public EmailService(JavaMailSender emailSender, PersonRepository repository) {
         this.emailSender = emailSender;
-        this.logger = logger;
 
+        people = repository.getAll();
     }
 
     public void remindAll() {
@@ -40,7 +39,6 @@ public class EmailService {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         logger.debug("Sending mail to " + person.getEmail());
-//        logger.debug("Mail content " + workout.toString());
 
         mailMessage.setTo(person.getEmail());
         mailMessage.setSubject("Twoj trening na dzis");
@@ -51,14 +49,14 @@ public class EmailService {
 
     private String prepareText(Person person) {
         DayOfWeek today = LocalDate.now().getDayOfWeek();
+
+        logger.debug("Sending workout for " + today.toString());
         Workout workout = person.getWeekDays().get(today);
+
 
         String greetings = "Hej " + person.getName() + "\n\n";
         String intro = "Na dzisiejszy dzień twój trening to:\n\n";
         return greetings + intro + workout.toString();
     }
 
-    public List<String> getLogs() {
-        return logger.getLogs();
-    }
 }
