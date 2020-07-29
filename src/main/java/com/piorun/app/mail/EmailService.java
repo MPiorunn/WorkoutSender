@@ -59,4 +59,7 @@ public class EmailService {
         return greetings + intro + workout.toString();
     }
 
+    public void remindMe() {
+        sendReminder(people.get(1));
+    }
 }

@@ -23,4 +23,14 @@ public class ReminderController {
         service.remindAll();
     }
 
+
+    @GetMapping("/send")
+    public void send() {
+        service.remindMe();
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<String> hello() {
+        return new ResponseEntity<>("Hello", HttpStatus.OK);
+    }
 }
